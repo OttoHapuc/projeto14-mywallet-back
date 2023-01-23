@@ -59,5 +59,14 @@ app.post("/cadastro", async(req, res) => {
     }catch(e){res.sendStatus(500)};
 })
 
+app.post("/home", async (req,res) => {
+    const user = req.headers.user;
+    if(!user) return res.sendStatus(401);
+    try{
+        const balance = await db.collection("balance").find({name: user}).toArray();
+        if(balance.length !== 0) res.send(balance)
+    }catch(e){res.sendStatus(500)};
+})
+
 
 app.listen(PORT);
