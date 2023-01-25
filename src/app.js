@@ -3,7 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import joi from 'joi';
 import { MongoClient } from 'mongodb';
-import { v4 as uuidV4 } from 'uuid'
+import { v4 as uuidV4 } from 'uuid';
+import dayjs from 'dayjs';
 
 dotenv.config();
 const app = express();
@@ -72,7 +73,7 @@ app.get("/home", async (req,res) => {
     const userExist = await db.collection("users").findOne({name: user});
     if(!userExist) return res.sendStatus(401);
     try{
-        const balance = await db.collection("balance").find({name: user}).toArray();
+        const balance = await db.collection("balance").find({user: userExist._id}).toArray();
         res.send(balance)
     }catch(e){res.sendStatus(500)};
 })
@@ -80,10 +81,6 @@ app.get("/home", async (req,res) => {
 app.post('/nova-entrada-saida', async (req, res) => {
     const user = req.headers.user;
     const {value, description, type} = req.body;
-    console.log(user);
-    console.log(value);
-    console.log(description);
-    console.log(type);
     if(!user) return res.sendStatus(401);
     const userExist = await db.collection("users").findOne({name: user});
     if(!userExist) return res.sendStatus(401);
@@ -93,7 +90,7 @@ app.post('/nova-entrada-saida', async (req, res) => {
         return res.status(422).send(errors);
     };
     try{
-        await db.collection("balance").insertOne({__id: userExist.__id, value,description,type});
+        await db.collection("balance").insertOne({user: userExist._id, value,description,type,data:dayjs().format("DD/MM")});
         res.status(201).send("OK")
     }
     catch(e){res.sendStatus(500)};
