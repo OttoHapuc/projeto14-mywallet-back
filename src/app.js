@@ -49,6 +49,7 @@ app.post("/", async (req,res)=>{
         if (userFound){
             return res.send({name: userFound.name});
         };
+        return res.status(401).send("tente Novamente")
     }catch(e) {res.sendStatus(500)}
 });
 
