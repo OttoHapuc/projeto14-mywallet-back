@@ -45,7 +45,7 @@ app.post("/", async (req,res)=>{
         return res.status(422).send(errors);
     };
     try{
-        const userFound = await db.collection("users").findOne({email: email});
+        const userFound = await db.collection("users").findOne({$and: [{email: email}, {password: password}]});
         if (userFound){
             return res.send({name: userFound.name});
         };
